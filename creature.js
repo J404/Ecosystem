@@ -13,8 +13,10 @@ class Creature {
     this.targetFood = null;
     this.trackingCreature = false;
 
-    this.reproductiveUrge = 30; // Implement later
-    this.hunger = 0;
+    this.motivation = {
+      reproductiveUrge: 30,
+      hunger: 0
+    };
   }
 
   move() {
@@ -23,7 +25,7 @@ class Creature {
     this.mass = this.dna.genes.mass;
     this.range = this.dna.genes.range;
 
-    this.hunger += .01 + (this.speedLimit / 50);
+    this.motivation.hunger += .01 + (this.speedLimit / 50);
 
     let acc = 0;
 
@@ -42,9 +44,9 @@ class Creature {
           this.trackingCreature = false;
         }
 
-        this.hunger -= 20;
-        if (this.hunger < 0)
-          this.hunger = 0;
+        this.motivation.hunger -= 20;
+        if (this.motivation.hunger < 0)
+          this.motivation.hunger = 0;
         this.targetFood = null;
       }
     }
@@ -143,10 +145,8 @@ class Creature {
       ellipse(this.pos.x, this.pos.y, this.range * 2);
       fill(150, 175);
       rect(this.pos.x - 50, this.pos.y + 50, 100, 25);
-      if (this.hunger > 0) {
-        fill(255, 255, 255, 175);
-        rect(this.pos.x - 50, this.pos.y + 50, this.hunger, 25);
-      }
+      fill(255, 255, 255, 175);
+      rect(this.pos.x - 50, this.pos.y + 50, this.motivation.hunger, 25);
     }
     fill(50);
     ellipse(this.pos.x, this.pos.y, this.mass);
