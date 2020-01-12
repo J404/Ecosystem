@@ -1,7 +1,11 @@
 class Dna {
   constructor() {
-    this.genes = [3, 20, 50];
-    // speed, mass, range
+    this.genes = {
+      speed: 3, 
+      mass: 20, 
+      range: 50
+    }
+    this.numTraits = 3;
   }
   
   // for asexual reproduction (cloning)
@@ -15,15 +19,15 @@ class Dna {
   // for genetic variation in sexual reproduction
   // selects which parents gives which genes then mutates each (possibly)
   crossover(partnerDNA, mutationRate) {
-    let offspringGenes = [];
-    for (let i = 0; i < this.genes.length; i++) {
+    let offspringGenes = this.genes;
+    for (let gene in this.genes) {
       if (random(1) < 0.5) {
-        offspringGenes[i] = this.genes[i];
+        offspringGenes[gene] = this.genes[gene];
       } else {
-        offspringGenes[i] = partnerDNA.genes[i];
+        offspringGenes[gene] = partnerDNA.genes[gene];
       }
       if (random(1) < mutationRate) {
-        offspringGenes[i] += random(-0.5, 1);
+        offspringGenes[gene] += random(-0.5, 0.5);
       }
     }
     
@@ -32,10 +36,10 @@ class Dna {
   
   // method for directly mutating genes
   mutate(mutationRate) {
-    for (let i = 0; i < this.genes.length; i++) {
+    for (let gene in this.genes) {
       if (random(1) <= mutationRate) {
         let change = random(-0.15, 0.15);
-        this.genes[i] += (abs(change * this.genes[i] < 5)) ? change * this.genes[i] : 5;
+        this.genes[gene] += (abs(change * this.genes[gene] < 5)) ? change * this.genes[gene] : 5;
       }
     }
   }

@@ -8,9 +8,9 @@ class Creature {
 
     // dna values / values from dna
     this.dna = new Dna();
-    this.speedLimit = this.dna.genes[0];
-    this.mass = this.dna.genes[1];
-    this.range = this.dna.genes[2];
+    this.speedLimit = this.dna.genes.speed;
+    this.mass = this.dna.genes.mass;
+    this.range = this.dna.genes.range;
 
     this.targetFood = null;
     this.trackingCreature = false;
@@ -27,9 +27,9 @@ class Creature {
 
   move() {
     // reset values
-    this.speedLimit = this.dna.genes[0];
-    this.mass = this.dna.genes[1];
-    this.range = this.dna.genes[2];
+    this.speedLimit = this.dna.genes.speed;
+    this.mass = this.dna.genes.mass;
+    this.range = this.dna.genes.range;
 
     this.reproductionClock++;
 
