@@ -16,8 +16,8 @@ function setup() {
   }
   
   //for (let i = 0; i < 15; i++) {
-    let sex = (random(1) < 0.5) ? "male" : "female";
     creatures[0] = new Creature(random(width), random(height));
+    creatures[1] = new Creature(random(width), random(height));
   //}
   
   creatureStats = {

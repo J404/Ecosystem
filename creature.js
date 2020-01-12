@@ -10,7 +10,10 @@ class Creature {
     this.mass = this.dna.genes.mass;
     this.range = this.dna.genes.range;
 
+    this.sex = (random(1) < 0.5) ? "male" : "female";
+
     this.targetFood = null;
+    this.targetMate = null;
     this.trackingCreature = false;
 
     this.motivation = {
@@ -41,7 +44,6 @@ class Creature {
         // if food is in range, eat food
         if (acc.mag() <= this.mass / 2) {
           if (!this.trackingCreature) {
-            console.log(this.targetFood);
             food.splice(food.indexOf(this.targetFood), 1);
           } else {
             creatures.splice(creatures.indexOf(this.targetFood), 1);
@@ -63,14 +65,29 @@ class Creature {
           this.targetFood = food;
         }
       }
+    // Urge to reproduce is greater than eating
     } else {
-      this.status = "searching for mate";
-      const mate = this.findMate();
+      if (this.targetMate != null) {
+        this.status = "found mate";
+        acc = p5.Vector.sub(this.targetMate.pos, this.pos);
 
-      if (mate != null) {
-        this.mate(mate);
+        if (acc.mag() <= this.mass / 2) {
+          if (this.targetMate.targetMate == this) {
+            this.status = "mating";
+            if (this.sex == "female") {
+              this.mate(this.targetMate);
+            }
+          }
+        }
       } else {
-        acc = p5.Vector.random2D();
+        this.status = "searching for mate";
+        const mate = this.findMate();
+
+        if (mate != null) {
+          this.targetMate = mate;
+        } else {
+          acc = p5.Vector.random2D();
+        }
       }
     }
 
