@@ -11,14 +11,14 @@ let debug = true;
 function setup() {
   createCanvas(1000, 1000);
   
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 10; i++) {
     food[i] = new Food(random(width), random(height));
   }
   
-  for (let i = 0; i < 15; i++) {
+  //for (let i = 0; i < 15; i++) {
     let sex = (random(1) < 0.5) ? "male" : "female";
-    creatures[i] = new Creature(random(width), random(height));
-  }
+    creatures[0] = new Creature(random(width), random(height));
+  //}
   
   creatureStats = {
     num: 0,
@@ -33,7 +33,7 @@ function draw() {
   background(0, 125, 0);
   
   foodTick++;
-  if (foodTick >= 2) {
+  if (foodTick >= 10) {
     foodTick = 0;
     newFood();
   }

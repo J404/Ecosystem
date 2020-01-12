@@ -1,7 +1,5 @@
 class Creature {
   constructor(x, y) {
-    this.energy = 25000;
-
     // position values
     this.pos = createVector(x, y);
     this.vel = createVector(0, 0);
@@ -15,14 +13,8 @@ class Creature {
     this.targetFood = null;
     this.trackingCreature = false;
 
-    this.reproductionClock = 0;
-  }
-
-  // use a function to determine how much energy each step costs the creature
-  energyPerStep() {
-    let energyCost = 0.75 * this.mass * this.vel.mag() * this.vel.mag();
-    let lifeCost = 25;
-    return energyCost + lifeCost;
+    this.reproductiveUrge = 30; // Implement later
+    this.hunger = 0;
   }
 
   move() {
@@ -31,13 +23,7 @@ class Creature {
     this.mass = this.dna.genes.mass;
     this.range = this.dna.genes.range;
 
-    this.reproductionClock++;
-
-    // each step costs creature some energy, relating to function above
-    this.energy -= this.energyPerStep();
-    if (this.energy <= 0) {
-      creatures.splice(creatures.indexOf(this), 1);
-    }
+    this.hunger += .01 + (this.speedLimit / 50);
 
     let acc = 0;
 
@@ -51,14 +37,15 @@ class Creature {
       if (acc.mag() <= this.mass / 2) {
         if (!this.trackingCreature) {
           food.splice(food.indexOf(this.targetFood), 1);
-          this.targetFood = null;
-          this.energy += 5000;
         } else {
-          this.energy += this.targetFood.energy * 0.8;
           creatures.splice(creatures.indexOf(this.targetFood), 1);
           this.trackingCreature = false;
-          this.targetFood = null;
         }
+
+        this.hunger -= 20;
+        if (this.hunger < 0)
+          this.hunger = 0;
+        this.targetFood = null;
       }
     }
 
@@ -114,6 +101,7 @@ class Creature {
       }
     }
 
+    /*
     // detect if another creature is in range
     // creature prioritizes eating other creatures over eating regular food
     // creature prioritizes mating over eating other creatures
@@ -137,6 +125,9 @@ class Creature {
         }
       }
     }
+    */
+   // ^^^ previous reproduction decider thing
+   // rework later
 
     if (debug && this.targetFood != null) {
       strokeWeight(1);
@@ -150,6 +141,12 @@ class Creature {
     if (debug) {
       fill(200, 200, 200, 100);
       ellipse(this.pos.x, this.pos.y, this.range * 2);
+      fill(150, 175);
+      rect(this.pos.x - 50, this.pos.y + 50, 100, 25);
+      if (this.hunger > 0) {
+        fill(255, 255, 255, 175);
+        rect(this.pos.x - 50, this.pos.y + 50, this.hunger, 25);
+      }
     }
     fill(50);
     ellipse(this.pos.x, this.pos.y, this.mass);
