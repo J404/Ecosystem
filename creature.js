@@ -143,10 +143,17 @@ class Creature {
     if (debug) {
       fill(200, 200, 200, 100);
       ellipse(this.pos.x, this.pos.y, this.range * 2);
-      fill(150, 175);
-      rect(this.pos.x - 50, this.pos.y + 50, 100, 25);
-      fill(255, 255, 255, 175);
-      rect(this.pos.x - 50, this.pos.y + 50, this.motivation.hunger, 25);
+      let yOffset = 50;
+      for (let urge in this.motivation) {
+        fill(150, 175);
+        rect(this.pos.x - 50, this.pos.y + yOffset, 100, 25);
+        fill(255, 255, 255, 175);
+        rect(this.pos.x - 50, this.pos.y + yOffset, this.motivation[urge], 25);
+        fill(0);
+        text(urge, this.pos.x - 50, this.pos.y + yOffset + 10);
+
+        yOffset += 30;
+      }
     }
     fill(50);
     ellipse(this.pos.x, this.pos.y, this.mass);
