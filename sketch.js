@@ -49,7 +49,7 @@ function draw() {
   let totalSpeed = 0, totalMass = 0, totalRange = 0;
   
   for (let c of creatures) {
-    c.see();
+    //c.see();
     c.move();
     c.show();
     

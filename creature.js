@@ -17,6 +17,7 @@ class Creature {
       reproductiveUrge: 30,
       hunger: 0
     };
+    this.status = "";
   }
 
   move() {
@@ -26,28 +27,50 @@ class Creature {
     this.range = this.dna.genes.range;
 
     this.motivation.hunger += .01 + (this.speedLimit / 50);
+    //this.motivation.reproductiveUrge += .01;
 
     let acc = 0;
 
-   // if there is no food sighted, move randomly
-    if (this.targetFood == null) {
-      acc = p5.Vector.random2D();
-    } else {
-      acc = p5.Vector.sub(this.targetFood.pos, this.pos);
+    // Needs to eat more than it needs to mate
+    if (this.motivation.hunger > this.motivation.reproductiveUrge) {
+      // If there is food in range
+      if (this.targetFood != null) {
+        this.status = "found food";
+        acc = p5.Vector.sub(this.targetFood.pos, this.pos);
 
-      // if food is in range, eat food
-      if (acc.mag() <= this.mass / 2) {
-        if (!this.trackingCreature) {
-          food.splice(food.indexOf(this.targetFood), 1);
-        } else {
-          creatures.splice(creatures.indexOf(this.targetFood), 1);
-          this.trackingCreature = false;
+        // if food is in range, eat food
+        if (acc.mag() <= this.mass / 2) {
+          if (!this.trackingCreature) {
+            console.log(this.targetFood);
+            food.splice(food.indexOf(this.targetFood), 1);
+          } else {
+            creatures.splice(creatures.indexOf(this.targetFood), 1);
+            this.trackingCreature = false;
+          }
+
+          this.motivation.hunger -= 20;
+          if (this.motivation.hunger < 0)
+            this.motivation.hunger = 0;
+          this.targetFood = null;
         }
+      } else {
+        this.status = "searching for food";
+        acc = p5.Vector.random2D();
 
-        this.motivation.hunger -= 20;
-        if (this.motivation.hunger < 0)
-          this.motivation.hunger = 0;
-        this.targetFood = null;
+        // Try to find the closest food in its range
+        const food = this.findFood();
+        if (food != null) {
+          this.targetFood = food;
+        }
+      }
+    } else {
+      this.status = "searching for mate";
+      const mate = this.findMate();
+
+      if (mate != null) {
+        this.mate(mate);
+      } else {
+        acc = p5.Vector.random2D();
       }
     }
 
@@ -80,6 +103,37 @@ class Creature {
     creatures.push(offspring);
   }
 
+  findFood() {
+    let smallestDist = 900;
+    let smallestDistIndex = -1;
+    
+    for (let i = 0; i < food.length; i++) {
+      let dist = p5.Vector.sub(food[i].pos, this.pos);
+      if (dist.mag() <= this.range) {
+        if (dist.mag() < smallestDist) {
+          smallestDist = dist.mag();
+          smallestDistIndex = i;
+        }
+      }
+    }
+
+    if (smallestDistIndex != -1) {
+      return food[smallestDistIndex];
+    } else {
+      return null;
+    }
+  }
+
+  findMate() {
+    for (let i = 0; i < creatures.length; i++) {
+      let dist = p5.Vector.sub(this.pos, creatures[i].pos);
+      if (dist.mag() <= this.range && creatures[i] != this) {
+        return creatures[i];
+      }
+    }
+  }
+
+  // DEPRECATED
   // determines if there is food within seeing range
   see() {
     // unless tracking another creature, creature will try and find regular food
@@ -111,7 +165,7 @@ class Creature {
       let dist = p5.Vector.sub(this.pos, creatures[i].pos);
       if (dist.mag() <= this.range && creatures[i] != this) {
         // 10 % chance the creature will mate with another in range
-        if (random(1) < 0.1 & this.reproductionClock > 250) {
+        if (random(1) < 0.1 & this.reproductionClock > 250) { 
           this.mate(creatures[i]);
           this.lastMate = creatures[i];
           this.reproductionClock = 0;
@@ -130,12 +184,6 @@ class Creature {
     */
    // ^^^ previous reproduction decider thing
    // rework later
-
-    if (debug && this.targetFood != null) {
-      strokeWeight(1);
-      stroke(0);
-      line(this.pos.x, this.pos.y, this.targetFood.pos.x, this.targetFood.pos.y);
-    }
   }
 
   show() {
@@ -143,6 +191,14 @@ class Creature {
     if (debug) {
       fill(200, 200, 200, 100);
       ellipse(this.pos.x, this.pos.y, this.range * 2);
+
+      if (this.targetFood != null) {
+        strokeWeight(1);
+        stroke(0);
+        line(this.pos.x, this.pos.y, this.targetFood.pos.x, this.targetFood.pos.y);
+        noStroke();
+      }
+
       let yOffset = 50;
       for (let urge in this.motivation) {
         fill(150, 175);
@@ -154,6 +210,8 @@ class Creature {
 
         yOffset += 30;
       }
+
+      text(this.status, this.pos.x, this.pos.y - 50);
     }
     fill(50);
     ellipse(this.pos.x, this.pos.y, this.mass);
