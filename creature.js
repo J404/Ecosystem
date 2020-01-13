@@ -5,6 +5,10 @@ class Creature {
     this.vel = createVector(0, 0);
 
     // dna values / values from dna
+    // ***************************************************
+    // TODO: MAKE REPRODUCTIVE URGE A GENE
+    // TODO: MAKE GESTATION A GENE
+    // ***************************************************
     this.dna = new Dna();
     this.speedLimit = this.dna.genes.speed;
     this.mass = this.dna.genes.mass;
@@ -16,11 +20,83 @@ class Creature {
     this.targetMate = null;
     this.trackingCreature = false;
 
+    this.gestating = false;
+    this.gestatingPeriod = 500;
+
     this.motivation = {
       reproductiveUrge: 30,
       hunger: 0
     };
+
     this.status = "";
+  }
+
+  // Uses the creature's various urges to determine what it needs to do,
+  // then returns a vector of acceleration in the direction of that goal
+  decideGoal() {
+
+    // If the hunger is greater than the urge to reproduce, the creature will try to find food
+    if (this.motivation.hunger > this.motivation.reproductiveUrge) {
+
+      // If food is not already found, search for food
+      if (this.targetFood == null) {
+        this.status = "searching for food";
+        if (this.findFood() != null) 
+          this.targetFood = this.findFood();
+
+        // Set the acceleration to random to try and find food
+        return p5.Vector.random2D();
+      
+      // If food has been found, target that food
+      } else {
+        this.status = "found food";
+        if (this.checkEdible(p5.Vector.sub(this.targetFood.pos, this.pos).mag()))
+          return 0;
+        else
+          return p5.Vector.sub(this.targetFood.pos, this.pos);
+      }
+    // Add future urges here
+    // For now, if hunger is not greater than urge to reproduce the creature will try and find a mate
+    } else {
+
+      // If a mate is not yet found, search for a mate
+      if (this.targetMate == null) {
+        this.status = "searching for a mate";
+        if (this.findMate() != null)
+          this.targetMate = this.findMate();
+
+        // Set the acceleration to random to try and find mate
+        return p5.Vector.random2D();
+
+      // If a mate is found, we target that mate
+      } else {
+        this.status = "found a mate";
+        return p5.Vector.sub(this.targetMate.pos, this.pos);
+      }
+    }
+  }
+
+  // Checks if the creature is able to eat a piece of food;
+  // if it is in range, the creature will eat the food
+  checkEdible(dist) {
+    // Checks if the food is in range
+    if (dist < this.mass / 2) {
+
+      // Delete the food from the food array
+      food.splice(food.indexOf(this.targetFood), 1);
+
+      // Reduce the hunger by 20
+      // If hunger is already at 0, keep it at 0
+      this.motivation.hunger = (this.motivation.hunger <= 0) ? 0 : this.motivation.hunger - 20;
+      
+      // Reset the target food
+      this.targetFood = null;
+
+      return true;
+    }
+
+    // If we cant eat it, return false
+    return false;
   }
 
   move() {
@@ -30,67 +106,9 @@ class Creature {
     this.range = this.dna.genes.range;
 
     this.motivation.hunger += .01 + (this.speedLimit / 50);
-    //this.motivation.reproductiveUrge += .01;
 
-    let acc = 0;
-
-    // Needs to eat more than it needs to mate
-    if (this.motivation.hunger > this.motivation.reproductiveUrge) {
-      // If there is food in range
-      if (this.targetFood != null) {
-        this.status = "found food";
-        acc = p5.Vector.sub(this.targetFood.pos, this.pos);
-
-        // if food is in range, eat food
-        if (acc.mag() <= this.mass / 2) {
-          if (!this.trackingCreature) {
-            food.splice(food.indexOf(this.targetFood), 1);
-          } else {
-            creatures.splice(creatures.indexOf(this.targetFood), 1);
-            this.trackingCreature = false;
-          }
-
-          this.motivation.hunger -= 20;
-          if (this.motivation.hunger < 0)
-            this.motivation.hunger = 0;
-          this.targetFood = null;
-        }
-      } else {
-        this.status = "searching for food";
-        acc = p5.Vector.random2D();
-
-        // Try to find the closest food in its range
-        const food = this.findFood();
-        if (food != null) {
-          this.targetFood = food;
-        }
-      }
-    // Urge to reproduce is greater than eating
-    } else {
-      if (this.targetMate != null) {
-        this.status = "found mate";
-        acc = p5.Vector.sub(this.targetMate.pos, this.pos);
-
-        if (acc.mag() <= this.mass / 2) {
-          if (this.targetMate.targetMate == this) {
-            this.status = "mating";
-            if (this.sex == "female") {
-              this.mate(this.targetMate);
-            }
-          }
-        }
-      } else {
-        this.status = "searching for mate";
-        const mate = this.findMate();
-
-        if (mate != null) {
-          this.targetMate = mate;
-        } else {
-          acc = p5.Vector.random2D();
-        }
-      }
-    }
-
+    // Get a goal direction from decide goal, then use that to control velocity/position
+    const acc = this.decideGoal();
     this.vel.add(acc);
     this.vel.setMag(this.speedLimit);
 
@@ -148,59 +166,6 @@ class Creature {
         return creatures[i];
       }
     }
-  }
-
-  // DEPRECATED
-  // determines if there is food within seeing range
-  see() {
-    // unless tracking another creature, creature will try and find regular food
-    if (!this.trackingCreature) {
-      let smallestDist = 900;
-      let smallestDistIndex = -1;
-    
-      for (let i = 0; i < food.length; i++) {
-        let dist = p5.Vector.sub(food[i].pos, this.pos);
-
-        if (dist.mag() <= this.range) {
-          if (dist.mag() < smallestDist) {
-            smallestDist = dist.mag();
-            smallestDistIndex = i;
-          }
-        }
-      }
-
-      if (smallestDistIndex != -1) {
-        this.targetFood = food[smallestDistIndex];
-      }
-    }
-
-    /*
-    // detect if another creature is in range
-    // creature prioritizes eating other creatures over eating regular food
-    // creature prioritizes mating over eating other creatures
-    for (let i = 0; i < creatures.length; i++) {
-      let dist = p5.Vector.sub(this.pos, creatures[i].pos);
-      if (dist.mag() <= this.range && creatures[i] != this) {
-        // 10 % chance the creature will mate with another in range
-        if (random(1) < 0.1 & this.reproductionClock > 250) { 
-          this.mate(creatures[i]);
-          this.lastMate = creatures[i];
-          this.reproductionClock = 0;
-        // otherwise, track it down to try and eat it if this creature is bigger
-        // the random is something I call aggressiveness
-        // it is purely so the creatures do not eat themselves to extinction
-        } else if (random(1) < 0.01 && creatures[i].mass < this.mass && creatures[i] != this.lastMate) {
-          this.targetFood = creatures[i];
-          strokeWeight(1);
-          stroke(0);
-          line(this.pos.x, this.pos.y, creatures[i].pos.x, creatures[i].pos.y);
-          this.trackingCreature = true;
-        }
-      }
-    }
-    */
-   // ^^^ previous reproduction decider thing
-   // rework later
   }
 
   show() {
