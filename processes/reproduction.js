@@ -7,7 +7,7 @@ const mate = (father, mother) => {
     const offspringGenes = Dna.crossover(father, mother, 0.15);
 
     // Create a new creature and set it's genes equal to those inherited above
-    const offspring = new Creature(this.pos.x, this.pos.y);
+    const offspring = new Creature(mother.pos.x, mother.pos.y);
     offspring.dna.genes = offspringGenes;
     
     // Add it to our creatures array
