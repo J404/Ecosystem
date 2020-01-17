@@ -18,6 +18,7 @@ function setup() {
   //for (let i = 0; i < 15; i++) {
     creatures[0] = new Creature(random(width), random(height));
     creatures[1] = new Creature(random(width), random(height));
+    creatures[1].dna.genes.speed = 5;
   //}
   
   creatureStats = {

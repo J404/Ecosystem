@@ -105,7 +105,9 @@ class Creature {
     this.mass = this.dna.genes.mass;
     this.range = this.dna.genes.range;
 
-    this.motivation.hunger += .01 + (this.speedLimit / 50);
+    // Exponential function to determine how much hunger is generated per step
+    // more speed results in greater hunger loss
+    this.motivation.hunger += .05 * Math.pow(1.25, this.speedLimit - 3);
 
     // Get a goal direction from decide goal, then use that to control velocity/position
     const acc = this.decideGoal();
