@@ -51,10 +51,17 @@ class Creature {
       // Otherwise, there is food found and we target it
       } else {
         this.status = "found food";
-        if (this.checkEdible(p5.Vector.sub(this.targetFood.pos, this.pos).mag()))
+        if (checkEdible(this.targetFood, this.pos, this.mass / 2)) {
+          // Reduce the hunger by 20
+          // If hunger is already at 0, keep it at 0
+          this.motivation.hunger = (this.motivation.hunger <= 0) ? 0 : this.motivation.hunger - 20;
+      
+          // Reset the target food
+          this.targetFood = null;
           return 0;
-        else
+        } else {
           return p5.Vector.sub(this.targetFood.pos, this.pos);
+        }
       }
     // Add future urges here
     // For now, if hunger is not greater than urge to reproduce the creature will try and find a mate
@@ -76,29 +83,6 @@ class Creature {
         return p5.Vector.sub(this.targetMate.pos, this.pos);
       }
     }
-  }
-
-  // Checks if the creature is able to eat a piece of food;
-  // if it is in range, the creature will eat the food
-  checkEdible(dist) {
-    // Checks if the food is in range
-    if (dist < this.mass / 2) {
-
-      // Delete the food from the food array
-      food.splice(food.indexOf(this.targetFood), 1);
-
-      // Reduce the hunger by 20
-      // If hunger is already at 0, keep it at 0
-      this.motivation.hunger = (this.motivation.hunger <= 0) ? 0 : this.motivation.hunger - 20;
-      
-      // Reset the target food
-      this.targetFood = null;
-
-      return true;
-    }
-
-    // If we cant eat it, return false
-    return false;
   }
 
   move() {
