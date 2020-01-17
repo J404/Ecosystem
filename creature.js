@@ -38,16 +38,17 @@ class Creature {
     // If the hunger is greater than the urge to reproduce, the creature will try to find food
     if (this.motivation.hunger > this.motivation.reproductiveUrge) {
 
-      // If food is not already found, search for food
+      // findFood method will search within creature's range and return closest food
+      this.targetFood = findFood(this.pos, this.range);
+
+      // If there is no food within range, it will return null
       if (this.targetFood == null) {
         this.status = "searching for food";
-        if (this.findFood() != null) 
-          this.targetFood = this.findFood();
 
         // Set the acceleration to random to try and find food
         return p5.Vector.random2D();
       
-      // If food has been found, target that food
+      // Otherwise, there is food found and we target it
       } else {
         this.status = "found food";
         if (this.checkEdible(p5.Vector.sub(this.targetFood.pos, this.pos).mag()))
@@ -59,11 +60,12 @@ class Creature {
     // For now, if hunger is not greater than urge to reproduce the creature will try and find a mate
     } else {
 
+      // Search the creatures range for any mates w/ findMate
+      this.targetMate = findMate(this.pos, this.range);
+
       // If a mate is not yet found, search for a mate
       if (this.targetMate == null) {
         this.status = "searching for a mate";
-        if (this.findMate() != null)
-          this.targetMate = this.findMate();
 
         // Set the acceleration to random to try and find mate
         return p5.Vector.random2D();
@@ -138,36 +140,6 @@ class Creature {
     offspring.dna.genes = offspringDNA;
     
     creatures.push(offspring);
-  }
-
-  findFood() {
-    let smallestDist = 900;
-    let smallestDistIndex = -1;
-    
-    for (let i = 0; i < food.length; i++) {
-      let dist = p5.Vector.sub(food[i].pos, this.pos);
-      if (dist.mag() <= this.range) {
-        if (dist.mag() < smallestDist) {
-          smallestDist = dist.mag();
-          smallestDistIndex = i;
-        }
-      }
-    }
-
-    if (smallestDistIndex != -1) {
-      return food[smallestDistIndex];
-    } else {
-      return null;
-    }
-  }
-
-  findMate() {
-    for (let i = 0; i < creatures.length; i++) {
-      let dist = p5.Vector.sub(this.pos, creatures[i].pos);
-      if (dist.mag() <= this.range && creatures[i] != this) {
-        return creatures[i];
-      }
-    }
   }
 
   show() {
