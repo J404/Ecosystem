@@ -1,3 +1,5 @@
+// This file holds the code for various things to draw relating to the creatures
+
 // Draws the creatures itself
 const drawCreature = (pos, size) => {
     noStroke();
