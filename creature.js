@@ -127,33 +127,21 @@ class Creature {
   }
 
   show() {
-    noStroke();
+
+    // If we are in debug mode it will display each creature's range,
+    // motivations, status, and target
     if (debug) {
-      fill(200, 200, 200, 100);
-      ellipse(this.pos.x, this.pos.y, this.range * 2);
+      drawRange(this.pos, this.range);
 
-      if (this.targetFood != null) {
-        strokeWeight(1);
-        stroke(0);
-        line(this.pos.x, this.pos.y, this.targetFood.pos.x, this.targetFood.pos.y);
-        noStroke();
-      }
+      if (this.targetFood != null)
+        drawLineToTarget(this.pos, this.targetFood);
 
-      let yOffset = 50;
-      for (let urge in this.motivation) {
-        fill(150, 175);
-        rect(this.pos.x - 50, this.pos.y + yOffset, 100, 25);
-        fill(255, 255, 255, 175);
-        rect(this.pos.x - 50, this.pos.y + yOffset, this.motivation[urge], 25);
-        fill(0);
-        text(urge, this.pos.x - 50, this.pos.y + yOffset + 10);
+      drawMotivations(this.pos, this.motivation);
 
-        yOffset += 30;
-      }
-
-      text(this.status, this.pos.x, this.pos.y - 50);
+      drawStatus(this.pos, this.status);
     }
-    fill(50);
-    ellipse(this.pos.x, this.pos.y, this.mass);
+
+    // Always draw the creature itself
+    drawCreature(this.pos, this.mass);
   }
 }
