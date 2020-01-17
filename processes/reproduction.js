@@ -8,7 +8,7 @@ const mate = (father, mother) => {
 
     // Create a new creature and set it's genes equal to those inherited above
     const offspring = new Creature(this.pos.x, this.pos.y);
-    offspring.dna.genes = offspringDNA;
+    offspring.dna.genes = offspringGenes;
     
     // Add it to our creatures array
     creatures.push(offspring);
