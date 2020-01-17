@@ -38,32 +38,41 @@ class Creature {
     // If the hunger is greater than the urge to reproduce, the creature will try to find food
     if (this.motivation.hunger > this.motivation.reproductiveUrge) {
 
-      // If food is not already found, search for food
+      // findFood method will search within creature's range and return closest food
+      this.targetFood = findFood(this.pos, this.range);
+
+      // If there is no food within range, it will return null
       if (this.targetFood == null) {
         this.status = "searching for food";
-        if (this.findFood() != null) 
-          this.targetFood = this.findFood();
 
         // Set the acceleration to random to try and find food
         return p5.Vector.random2D();
       
-      // If food has been found, target that food
+      // Otherwise, there is food found and we target it
       } else {
         this.status = "found food";
-        if (this.checkEdible(p5.Vector.sub(this.targetFood.pos, this.pos).mag()))
+        if (checkEdible(this.targetFood, this.pos, this.mass / 2)) {
+          // Reduce the hunger by 20
+          // If hunger is already at 0, keep it at 0
+          this.motivation.hunger = (this.motivation.hunger <= 0) ? 0 : this.motivation.hunger - 20;
+      
+          // Reset the target food
+          this.targetFood = null;
           return 0;
-        else
+        } else {
           return p5.Vector.sub(this.targetFood.pos, this.pos);
+        }
       }
     // Add future urges here
     // For now, if hunger is not greater than urge to reproduce the creature will try and find a mate
     } else {
 
+      // Search the creatures range for any mates w/ findMate
+      this.targetMate = findMate(this.pos, this.range);
+
       // If a mate is not yet found, search for a mate
       if (this.targetMate == null) {
         this.status = "searching for a mate";
-        if (this.findMate() != null)
-          this.targetMate = this.findMate();
 
         // Set the acceleration to random to try and find mate
         return p5.Vector.random2D();
@@ -74,29 +83,6 @@ class Creature {
         return p5.Vector.sub(this.targetMate.pos, this.pos);
       }
     }
-  }
-
-  // Checks if the creature is able to eat a piece of food;
-  // if it is in range, the creature will eat the food
-  checkEdible(dist) {
-    // Checks if the food is in range
-    if (dist < this.mass / 2) {
-
-      // Delete the food from the food array
-      food.splice(food.indexOf(this.targetFood), 1);
-
-      // Reduce the hunger by 20
-      // If hunger is already at 0, keep it at 0
-      this.motivation.hunger = (this.motivation.hunger <= 0) ? 0 : this.motivation.hunger - 20;
-      
-      // Reset the target food
-      this.targetFood = null;
-
-      return true;
-    }
-
-    // If we cant eat it, return false
-    return false;
   }
 
   move() {
@@ -123,81 +109,22 @@ class Creature {
     }
   }
 
-  // creates replica through asexual reproduction
-  createBaby() {
-    let baby = new Creature(this.pos.x, this.pos.y, this.color);
-    baby.dna = this.dna.replicate();
-
-    creatures.push(baby);
-  }
-  
-  // creates new organism through sexual reproduction
-  mate(partner) {
-    let offspringDNA = this.dna.crossover(partner.dna, 0.15);
-    let offspring = new Creature(this.pos.x, this.pos.y);
-    offspring.dna.genes = offspringDNA;
-    
-    creatures.push(offspring);
-  }
-
-  findFood() {
-    let smallestDist = 900;
-    let smallestDistIndex = -1;
-    
-    for (let i = 0; i < food.length; i++) {
-      let dist = p5.Vector.sub(food[i].pos, this.pos);
-      if (dist.mag() <= this.range) {
-        if (dist.mag() < smallestDist) {
-          smallestDist = dist.mag();
-          smallestDistIndex = i;
-        }
-      }
-    }
-
-    if (smallestDistIndex != -1) {
-      return food[smallestDistIndex];
-    } else {
-      return null;
-    }
-  }
-
-  findMate() {
-    for (let i = 0; i < creatures.length; i++) {
-      let dist = p5.Vector.sub(this.pos, creatures[i].pos);
-      if (dist.mag() <= this.range && creatures[i] != this) {
-        return creatures[i];
-      }
-    }
-  }
-
   show() {
-    noStroke();
+
+    // If we are in debug mode it will display each creature's range,
+    // motivations, status, and target
     if (debug) {
-      fill(200, 200, 200, 100);
-      ellipse(this.pos.x, this.pos.y, this.range * 2);
+      drawRange(this.pos, this.range);
 
-      if (this.targetFood != null) {
-        strokeWeight(1);
-        stroke(0);
-        line(this.pos.x, this.pos.y, this.targetFood.pos.x, this.targetFood.pos.y);
-        noStroke();
-      }
+      if (this.targetFood != null)
+        drawLineToTarget(this.pos, this.targetFood);
 
-      let yOffset = 50;
-      for (let urge in this.motivation) {
-        fill(150, 175);
-        rect(this.pos.x - 50, this.pos.y + yOffset, 100, 25);
-        fill(255, 255, 255, 175);
-        rect(this.pos.x - 50, this.pos.y + yOffset, this.motivation[urge], 25);
-        fill(0);
-        text(urge, this.pos.x - 50, this.pos.y + yOffset + 10);
+      drawMotivations(this.pos, this.motivation);
 
-        yOffset += 30;
-      }
-
-      text(this.status, this.pos.x, this.pos.y - 50);
+      drawStatus(this.pos, this.status);
     }
-    fill(50);
-    ellipse(this.pos.x, this.pos.y, this.mass);
+
+    // Always draw the creature itself
+    drawCreature(this.pos, this.mass);
   }
 }

@@ -8,24 +8,24 @@ class Dna {
     this.numTraits = 3;
   }
   
-  // for asexual reproduction (cloning)
-  replicate() {
-    let newDNA = new Dna();
-    newDNA.genes = this.genes;
-    newDNA.mutate(0.05);
-    return newDNA;
-  }
-  
-  // for genetic variation in sexual reproduction
-  // selects which parents gives which genes then mutates each (possibly)
-  crossover(partnerDNA, mutationRate) {
-    let offspringGenes = this.genes;
-    for (let gene in this.genes) {
+  // Returns new genes from two parents through sexual reproduction using
+  // the crossover method
+  // This function is static so it can be accessed by reproduction.js
+  static crossover(father, mother, mutationRate) {
+
+    // Just to start, we set the genes to the father's
+    const offspringGenes = father.genes;
+
+    for (let gene in offspringGenes) {
+
+      // For each gene, there is a 50% chance it comes from the mother or father
       if (random(1) < 0.5) {
-        offspringGenes[gene] = this.genes[gene];
+        offspringGenes[gene] = father.genes[gene];
       } else {
-        offspringGenes[gene] = partnerDNA.genes[gene];
+        offspringGenes[gene] = mother.genes[gene];
       }
+
+      // There is also a chance that the gene will mutate
       if (random(1) < mutationRate) {
         offspringGenes[gene] += random(-0.5, 0.5);
       }
@@ -42,5 +42,14 @@ class Dna {
         this.genes[gene] += (abs(change * this.genes[gene] < 5)) ? change * this.genes[gene] : 5;
       }
     }
+  }
+
+  // DEPRECATED
+  // for asexual reproduction (cloning)
+  replicate() {
+    let newDNA = new Dna();
+    newDNA.genes = this.genes;
+    newDNA.mutate(0.05);
+    return newDNA;
   }
 }
