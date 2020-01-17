@@ -109,23 +109,6 @@ class Creature {
     }
   }
 
-  // creates replica through asexual reproduction
-  createBaby() {
-    let baby = new Creature(this.pos.x, this.pos.y, this.color);
-    baby.dna = this.dna.replicate();
-
-    creatures.push(baby);
-  }
-  
-  // creates new organism through sexual reproduction
-  mate(partner) {
-    let offspringDNA = this.dna.crossover(partner.dna, 0.15);
-    let offspring = new Creature(this.pos.x, this.pos.y);
-    offspring.dna.genes = offspringDNA;
-    
-    creatures.push(offspring);
-  }
-
   show() {
 
     // If we are in debug mode it will display each creature's range,
