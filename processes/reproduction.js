@@ -3,6 +3,7 @@
 // Handles logic for mating two parents
 const mate = (father, mother) => {
     mother.gestating = true;
+    mother.partner = father;
 }
 
 // Creates new organism through sexual reproduction
@@ -20,16 +21,24 @@ const reproduce = (father, mother) => {
 }
 
 // Pass in two creatures and checks if the two are mateable
-const checkMateable = (father, mother) => {
+const checkMateable = (creature1, creature2) => {
+    let mother, father;
+
+    if (creature1.sex == "female") {
+        mother = creature1;
+        father = creature2;
+    } else {
+        father = creature1;
+        mother = creature2;
+    }
 
     // One requirement is that the female is not gestating
     const isGestating = mother.gestating;
 
-    // The two partners must be in range of each other
-    const dist = p5.Vector.sub(father.pos, mother.pos);
-    const inRange = dist.mag() < father.mass / 2;
+    // Female's birth cooldown must be 0 (starts at 500 after a birth)
+    const isReady = mother.birthCooldown <= 0;
 
-    return !isGestating && inRange; // Add future requirements here with &&
+    return !isGestating && isReady; // Add future requirements here with &&
 }
 
 // DEPRECATED: TEST PURPOSES ONLY

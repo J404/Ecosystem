@@ -20,8 +20,12 @@ class Creature {
     this.targetMate = null;
     this.trackingCreature = false;
 
+    // Female specific traits
+    // May use inheritance later and set up a separate class
     this.gestating = false;
     this.gestatingPeriod = 500;
+    this.partner;
+    this.birthCooldown = 0;
 
     this.motivation = {
       reproductiveUrge: 30,
@@ -36,7 +40,8 @@ class Creature {
   decideGoal() {
 
     // If the hunger is greater than the urge to reproduce, the creature will try to find food
-    if (this.motivation.hunger > this.motivation.reproductiveUrge) {
+    // If the creature is gestating, it will default to search for food
+    if ((this.motivation.hunger > this.motivation.reproductiveUrge) || this.gestating) {
 
       // findFood method will search within creature's range and return closest food
       this.targetFood = findFood(this.pos, this.range);
@@ -54,7 +59,7 @@ class Creature {
         if (checkEdible(this.targetFood, this.pos, this.mass / 2)) {
           // Reduce the hunger by 20
           // If hunger is already at 0, keep it at 0
-          this.motivation.hunger = (this.motivation.hunger <= 0) ? 0 : this.motivation.hunger - 20;
+          this.motivation.hunger = (this.motivation.hunger - 20 <= 0) ? 0 : this.motivation.hunger - 20;
       
           // Reset the target food
           this.targetFood = null;
@@ -65,7 +70,7 @@ class Creature {
       }
     // Add future urges here
     // For now, if hunger is not greater than urge to reproduce the creature will try and find a mate
-    } else {
+    } else if (!this.gestating) {
 
       // Search the creatures range for any mates w/ findMate
       this.targetMate = findMate(this.pos, this.range, this.sex);
@@ -78,12 +83,17 @@ class Creature {
         return p5.Vector.random2D();
 
       // If a mate is found, we target that mate
-      } else {
+      } else if (checkMateable(this, this.targetMate)) {
         this.status = "found a mate";
 
         // Arbitrarily, reproduction is initiated by males
         if (this.sex == "male") {
-          if (checkMateable(this, this.targetMate)) {
+
+          // Checks if the two creatures are touching before mating begins
+          const dist = p5.Vector.sub(this.pos, this.targetMate.pos);
+          const inRange = dist.mag() < this.mass / 2;
+
+          if (inRange) {
             mate(this, this.targetMate);
 
             return 0;
@@ -105,7 +115,31 @@ class Creature {
 
     // Exponential function to determine how much hunger is generated per step
     // more speed results in greater hunger loss
-    this.motivation.hunger += .05 * Math.pow(1.25, this.speedLimit - 3);
+    this.motivation.hunger += .05 * Math.pow(1.3, this.speedLimit - 3);
+
+    // If our hunger is greater than 100, the creature is dead
+    if (this.motivation.hunger > 100) {
+      creatures.splice(creatures.indexOf(this), 1);
+    }
+
+    // If gestating, we lower the clock by one
+    // If the gestating period is at 0 the female is ready to give birth
+    if (this.sex == "female") {
+      if (this.gestating) {
+        this.gestatingPeriod--;
+
+        if (this.gestatingPeriod <= 0) {
+          this.gestating = false;
+
+          // Change this to be  based off dna later
+          this.gestatingPeriod = 500;
+          this.birthCooldown = 500;
+
+          reproduce(this.partner, this);
+        }
+    } else if (this.birthCooldown > 0)
+      this.birthCooldown--;
+    }
 
     // Get a goal direction from decide goal, then use that to control velocity/position
     const acc = this.decideGoal();

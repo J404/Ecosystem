@@ -14,15 +14,15 @@ class Dna {
   static crossover(father, mother, mutationRate) {
 
     // Just to start, we set the genes to the father's
-    const offspringGenes = father.genes;
+    const offspringGenes = father.dna.genes;
 
     for (let gene in offspringGenes) {
 
       // For each gene, there is a 50% chance it comes from the mother or father
       if (random(1) < 0.5) {
-        offspringGenes[gene] = father.genes[gene];
+        offspringGenes[gene] = father.dna.genes[gene];
       } else {
-        offspringGenes[gene] = mother.genes[gene];
+        offspringGenes[gene] = mother.dna.genes[gene];
       }
 
       // There is also a chance that the gene will mutate
@@ -30,6 +30,8 @@ class Dna {
         offspringGenes[gene] += random(-0.5, 0.5);
       }
     }
+
+    console.log(offspringGenes);
     
     return offspringGenes;
   }
