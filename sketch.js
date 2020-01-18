@@ -34,7 +34,7 @@ function draw() {
   background(0, 125, 0);
   
   foodTick++;
-  if (foodTick >= 10) {
+  if (foodTick >= 50) {
     foodTick = 0;
     newFood();
   }
