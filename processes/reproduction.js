@@ -9,15 +9,18 @@ const mate = (father, mother) => {
 // Creates new organism through sexual reproduction
 const reproduce = (father, mother) => {
 
-    // Offspring's genes are determined by mother and father's
-    const offspringGenes = Dna.crossover(father, mother, 0.15);
+    // Number of  offspring per birth is determined by genes
+    for (let i = 0; i < mother.dna.genes.numOffspring; i++) {
+        // Offspring's genes are determined by mother and father's
+        const offspringGenes = Dna.crossover(father, mother, 0.15);
 
-    // Create a new creature and set it's genes equal to those inherited above
-    const offspring = new Creature(mother.pos.x, mother.pos.y);
-    offspring.dna.genes = offspringGenes;
+        // Create a new creature and set it's genes equal to those inherited above
+        const offspring = new Creature(mother.pos.x, mother.pos.y);
+        offspring.dna.genes = offspringGenes;
     
-    // Add it to our creatures array
-    creatures.push(offspring);
+        // Add it to our creatures array
+        creatures.push(offspring);
+    }
 }
 
 // Pass in two creatures and checks if the two are mateable
