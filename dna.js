@@ -3,7 +3,9 @@ class Dna {
     this.genes = {
       speed: 3, 
       mass: 20, 
-      range: 50
+      range: 75,
+      gestationPeriod: 500,
+      reproductiveUrge: 30
     }
     this.numTraits = 3;
   }
@@ -26,8 +28,9 @@ class Dna {
       }
 
       // There is also a chance that the gene will mutate
+      // genes can change by + or - 15% of the original
       if (random(1) < mutationRate) {
-        offspringGenes[gene] += random(-0.5, 0.5);
+        offspringGenes[gene] += random(-0.15, 0.15) * offspringGenes[gene];
       }
     }
 

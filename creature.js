@@ -4,16 +4,13 @@ class Creature {
     this.pos = createVector(x, y);
     this.vel = createVector(0, 0);
 
-    // dna values / values from dna
-    // ***************************************************
-    // TODO: MAKE REPRODUCTIVE URGE A GENE
-    // TODO: MAKE GESTATION A GENE
-    // ***************************************************
+    // intial traits from dna
     this.dna = new Dna();
     this.speedLimit = this.dna.genes.speed;
     this.mass = this.dna.genes.mass;
     this.range = this.dna.genes.range;
 
+    // 50% chance the creature is a male or female
     this.sex = (random(1) < 0.5) ? "male" : "female";
 
     this.targetFood = null;
@@ -23,12 +20,13 @@ class Creature {
     // Female specific traits
     // May use inheritance later and set up a separate class
     this.gestating = false;
-    this.gestatingPeriod = 500;
+    this.gestatingPeriod = this.dna.genes.gestationPeriod;
     this.partner;
     this.birthCooldown = 0;
 
+    // Object containing the 'urges' that influence the creature's behavior
     this.motivation = {
-      reproductiveUrge: 30,
+      reproductiveUrge: this.dna.genes.reproductiveUrge,
       hunger: 0
     };
 
