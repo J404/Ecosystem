@@ -68,7 +68,7 @@ class Creature {
     } else {
 
       // Search the creatures range for any mates w/ findMate
-      this.targetMate = findMate(this.pos, this.range);
+      this.targetMate = findMate(this.pos, this.range, this.sex);
 
       // If a mate is not yet found, search for a mate
       if (this.targetMate == null) {
@@ -80,7 +80,19 @@ class Creature {
       // If a mate is found, we target that mate
       } else {
         this.status = "found a mate";
-        return p5.Vector.sub(this.targetMate.pos, this.pos);
+
+        // Arbitrarily, reproduction is initiated by males
+        if (this.sex == "male") {
+          if (checkMateable(this, this.targetMate)) {
+            mate(this, this.targetMate);
+
+            return 0;
+          } else {
+            return p5.Vector.sub(this.targetMate.pos, this.pos);
+          }
+        } else {
+          return p5.Vector.sub(this.targetMate.pos, this.pos);
+        }
       }
     }
   }
@@ -101,7 +113,7 @@ class Creature {
     this.vel.setMag(this.speedLimit);
 
     // boundaries check
-    let newPos = p5.Vector.add(this.pos, this.vel);
+    const newPos = p5.Vector.add(this.pos, this.vel);
     if (newPos.x > 0 && newPos.x < width && newPos.y > 0 && newPos.y < width) {
       this.pos.add(this.vel);
     } else {
