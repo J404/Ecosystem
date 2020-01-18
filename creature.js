@@ -113,7 +113,7 @@ class Creature {
 
     // Exponential function to determine how much hunger is generated per step
     // more speed results in greater hunger loss
-    this.motivation.hunger += .05 * Math.pow(1.3, this.speedLimit - 3);
+    this.motivation.hunger += .05 * Math.pow(1.5, this.speedLimit - 3);
 
     // If our hunger is greater than 100, the creature is dead
     if (this.motivation.hunger > 100) {
