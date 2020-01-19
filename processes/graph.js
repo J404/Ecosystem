@@ -13,8 +13,11 @@ const initGraph = () => {
         // Initialize an attribute for each gene as an array
         // each attribute will be an array so we can store many values in it over time
         // the first data point will be the default dna values
-        graph[gene] = [exDna.genes[gene]];
+        graph[gene] = [ exDna.genes[gene] ];
     }
+
+    // Default the number of offspring to the starting amount
+    graph.num = [ startingNumCreatures ];
 }
 
 // Accepts new data in the form of an object with each gene/trait and its corresponding
@@ -27,7 +30,13 @@ const addData = (data) => {
 
 // Accepts an array of data (for a trait) and returns the average
 const average = (data) => {
+    let total = 0;
 
+    for (let i = 0; i < data.length; i++) {
+        total += data[i];
+    }
+
+    return total / data.length;
 }
 
 let test = [4, 5, 6];
@@ -41,8 +50,13 @@ const drawGraph = (gene, x, y, w, h) => {
     const maxY = Math.max(...graph[gene]);
     const yScale = h / maxY;
 
+    fill(0);
+    textSize(20);
+    text(maxY, x + 20, y + 20);
+
     let prevX = 0;
     let prevY = graph[gene][0];
+
     for (let i = 1; i < graph[gene].length; i++) {
         const pointX = prevX + xOffset;
         const pointY = graph[gene][i];

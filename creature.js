@@ -113,7 +113,8 @@ class Creature {
 
     // Exponential function to determine how much hunger is generated per step
     // more speed results in greater hunger loss
-    this.motivation.hunger += .05 * Math.pow(1.5, this.speedLimit - 3);
+    this.motivation.hunger += 0.075 * Math.pow(1.3, this.speedLimit - 3);
+    this.motivation.hunger += 0.0005 * this.mass;
 
     // If our hunger is greater than 100, the creature is dead
     if (this.motivation.hunger > 100) {
@@ -129,9 +130,8 @@ class Creature {
         if (this.gestatingPeriod <= 0) {
           this.gestating = false;
 
-          // Change this to be  based off dna later
-          this.gestatingPeriod = 500;
-          this.birthCooldown = 500;
+          this.gestatingPeriod = this.dna.genes.gestationPeriod;
+          this.birthCooldown = 1000;
 
           reproduce(this.partner, this);
         }

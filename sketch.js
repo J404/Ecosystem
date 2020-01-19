@@ -2,6 +2,7 @@ let food = [];
 let foodTick = 0;
 
 let creatures = [];
+const startingNumCreatures = 10;
 let creatureStats;
 let creatureHistory = [];
 let infoTick = 0;
@@ -9,10 +10,10 @@ let infoTick = 0;
 let debug = true;
 
 function setup() {
-  createCanvas(1000, 1000);
+  createCanvas(1500, 1500);
 
-  // DEBUG: REMOVE LATER
   initGraph();
+
   let data = {
     speed: 4, 
     mass: 13, 
@@ -27,11 +28,14 @@ function setup() {
     food[i] = new Food(random(width), random(height));
   }
   
-  //for (let i = 0; i < 15; i++) {
-    creatures[0] = new Creature(random(width), random(height));
-    creatures[1] = new Creature(random(width), random(height));
-    creatures[1].dna.genes.speed = 5;
-  //}
+  for (let i = 0; i < startingNumCreatures; i++) {
+    creatures[i] = new Creature(random(width), random(height));
+    if (i % 2 == 0) {
+      creatures[i].sex = "female";
+    } else {
+      creatures[i].sex = "male";
+    }
+  }
   
   creatureStats = {
     num: 0,
@@ -45,10 +49,10 @@ function setup() {
 function draw() {
   background(0, 125, 0);
 
-  drawGraph("speed", 0, 0, 500, 200);
+  drawGraph("num", 0, 0, 500, 200);
   
   foodTick++;
-  if (foodTick >= 50) {
+  if (foodTick >= 10) {
     foodTick = 0;
     newFood();
   }
@@ -57,22 +61,9 @@ function draw() {
     f.show();
   }
   
-  creatureStats.num = creatures.length;
-  creatureStats.speed = [];
-  creatureStats.mass = [];
-  creatureStats.range = [];
-  let totalSpeed = 0, totalMass = 0, totalRange = 0;
-  
   for (let c of creatures) {
     c.move();
     c.show();
-    
-    creatureStats.speed[creatureStats.speed.length] = c.speedLimit;
-    creatureStats.mass[creatureStats.mass.length] = c.mass;
-    creatureStats.range[creatureStats.range.length] = c.range;
-    totalSpeed += c.speedLimit;
-    totalMass += c.mass;
-    totalRange += c.range;
   }
   
   infoTick++;
@@ -81,11 +72,22 @@ function draw() {
   }
   if (infoTick > 500 && debug) {
     infoTick = 0;
-    console.log(creatureStats);
-    console.log("Number of creatures: " + creatureStats.num);
-    console.log("Average speed: " + totalSpeed / creatureStats.num);
-    console.log("Average mass: " + totalMass / creatureStats.num);
-    console.log("Average range: " + totalRange / creatureStats.num);
+
+    const creatureStats = {};
+
+    for (let gene in creatures[0].dna.genes) {
+      let geneVals = [];
+
+      for (let c of creatures) {
+        geneVals.push(c.dna.genes[gene]);
+      }
+
+      const avgVal = average(geneVals);
+      creatureStats[gene] = avgVal;
+    }
+
+    creatureStats.num = creatures.length;
+    addData(creatureStats);
   }
 }
 
