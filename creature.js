@@ -131,7 +131,7 @@ class Creature {
           this.gestating = false;
 
           this.gestatingPeriod = this.dna.genes.gestationPeriod;
-          this.birthCooldown = 1000;
+          this.birthCooldown = 1250;
 
           reproduce(this.partner, this);
         }

@@ -15,11 +15,10 @@ class Dna {
   // the crossover method
   // This function is static so it can be accessed by reproduction.js
   static crossover(father, mother, mutationRate) {
+    const offspringGenes = {};
 
-    // Just to start, we set the genes to the father's
-    const offspringGenes = father.dna.genes;
-
-    for (let gene in offspringGenes) {
+    // It doesn't matter which parent's genes we cycle through because they should be the same
+    for (let gene in father.dna.genes) {
 
       // For each gene, there is a 50% chance it comes from the mother or father
       if (random(1) < 0.5) {
