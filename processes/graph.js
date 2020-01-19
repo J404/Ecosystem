@@ -29,3 +29,29 @@ const addData = (data) => {
 const average = (data) => {
 
 }
+
+let test = [4, 5, 6];
+
+const drawGraph = (gene, x, y, w, h) => {
+    fill(255);
+    rect(x, y, w, h);
+
+    // To find the offset between each data point, we divide the total length by the number of data points
+    const xOffset = w / graph[gene].length;
+    const maxY = Math.max(...graph[gene]);
+    const yScale = h / maxY;
+
+    let prevX = 0;
+    let prevY = graph[gene][0];
+    for (let i = 1; i < graph[gene].length; i++) {
+        const pointX = prevX + xOffset;
+        const pointY = graph[gene][i];
+
+        stroke(0);
+        strokeWeight(2);
+        line(x + prevX, (y + h) - prevY * yScale, x + pointX, (y + h) - pointY * yScale);
+
+        prevX = pointX;
+        prevY = pointY;
+    }
+}

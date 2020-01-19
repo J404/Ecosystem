@@ -10,6 +10,18 @@ let debug = true;
 
 function setup() {
   createCanvas(1000, 1000);
+
+  // DEBUG: REMOVE LATER
+  initGraph();
+  let data = {
+    speed: 4, 
+    mass: 13, 
+    range: 82,
+    gestationPeriod: 222,
+    reproductiveUrge: 99,
+    numOffspring: 1
+  }
+  addData(data);
   
   for (let i = 0; i < 10; i++) {
     food[i] = new Food(random(width), random(height));
@@ -32,6 +44,8 @@ function setup() {
 
 function draw() {
   background(0, 125, 0);
+
+  drawGraph("speed", 0, 0, 500, 200);
   
   foodTick++;
   if (foodTick >= 50) {
