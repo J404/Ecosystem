@@ -9,27 +9,20 @@ let infoTick = 0;
 
 let debug = true;
 
+const environmentWidth = 1500;
+const environmentHeight = 1500;
+
 function setup() {
-  createCanvas(1500, 1500);
+  createCanvas(2000, 1500);
 
   initGraph();
-
-  let data = {
-    speed: 4, 
-    mass: 13, 
-    range: 82,
-    gestationPeriod: 222,
-    reproductiveUrge: 99,
-    numOffspring: 1
-  }
-  addData(data);
   
   for (let i = 0; i < 10; i++) {
-    food[i] = new Food(random(width), random(height));
+    food[i] = new Food(random(environmentWidth), random(environmentHeight));
   }
   
   for (let i = 0; i < startingNumCreatures; i++) {
-    creatures[i] = new Creature(random(width), random(height));
+    creatures[i] = new Creature(random(environmentWidth), random(environmentHeight));
     if (i % 2 == 0) {
       creatures[i].sex = "female";
     } else {
@@ -49,7 +42,13 @@ function setup() {
 function draw() {
   background(0, 125, 0);
 
-  drawGraph("num", 0, 0, 500, 200);
+  drawGraph("num", environmentWidth, 0, 500, 200);
+  drawGraph("speed", environmentWidth, 220, 500, 200);
+  drawGraph("mass", environmentWidth, 440, 500, 200);
+  drawGraph("range", environmentWidth, 660, 500, 200);
+  drawGraph("gestationPeriod", environmentWidth, 880, 500, 200);
+  drawGraph("reproductiveUrge", environmentWidth, 1100, 500, 200);
+  drawGraph("numOffspring", environmentWidth, 1320, 500, 200);
   
   foodTick++;
   if (foodTick >= 10) {
@@ -92,7 +91,7 @@ function draw() {
 }
 
 function newFood() {
-  food[food.length] = new Food(random(0, width), random(0, height));
+  food[food.length] = new Food(random(0, environmentWidth), random(0, environmentHeight));
 }
 
 function keyPressed() {

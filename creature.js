@@ -39,7 +39,7 @@ class Creature {
 
     // If the hunger is greater than the urge to reproduce, the creature will try to find food
     // If the creature is gestating, it will default to search for food
-    if ((this.motivation.hunger > this.motivation.reproductiveUrge) || this.gestating) {
+    if ((this.motivation.hunger > this.motivation.reproductiveUrge) || this.gestating || this.birthCooldown > 0) {
 
       // findFood method will search within creature's range and return closest food
       this.targetFood = findFood(this.pos, this.range);
@@ -113,8 +113,8 @@ class Creature {
 
     // Exponential function to determine how much hunger is generated per step
     // more speed results in greater hunger loss
-    this.motivation.hunger += 0.075 * Math.pow(1.3, this.speedLimit - 3);
-    this.motivation.hunger += 0.0005 * this.mass;
+    this.motivation.hunger += 0.05 + .005 * this.speedLimit;
+    this.motivation.hunger += 0.005 * this.mass;
 
     // If our hunger is greater than 100, the creature is dead
     if (this.motivation.hunger > 100) {
@@ -131,7 +131,7 @@ class Creature {
           this.gestating = false;
 
           this.gestatingPeriod = this.dna.genes.gestationPeriod;
-          this.birthCooldown = 1250;
+          this.birthCooldown = 1500;
 
           reproduce(this.partner, this);
         }
@@ -146,7 +146,7 @@ class Creature {
 
     // boundaries check
     const newPos = p5.Vector.add(this.pos, this.vel);
-    if (newPos.x > 0 && newPos.x < width && newPos.y > 0 && newPos.y < width) {
+    if (newPos.x > 0 && newPos.x < environmentWidth && newPos.y > 0 && newPos.y < environmentHeight) {
       this.pos.add(this.vel);
     } else {
       this.vel = createVector(0, 0);

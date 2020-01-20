@@ -4,8 +4,8 @@ class Dna {
       speed: 3, 
       mass: 20, 
       range: 75,
-      gestationPeriod: 550,
-      reproductiveUrge: 30,
+      gestationPeriod: 600,
+      reproductiveUrge: 35,
       numOffspring: 2
     }
     this.numTraits = 3;

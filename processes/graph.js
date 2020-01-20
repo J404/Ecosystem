@@ -52,7 +52,9 @@ const drawGraph = (gene, x, y, w, h) => {
 
     fill(0);
     textSize(20);
-    text(maxY, x + 20, y + 20);
+    strokeWeight(1);
+    text(maxY.toFixed(3), x + 20, y + 20);
+    text(gene, x + 20, y + h - 20);
 
     let prevX = 0;
     let prevY = graph[gene][0];
@@ -68,4 +70,9 @@ const drawGraph = (gene, x, y, w, h) => {
         prevX = pointX;
         prevY = pointY;
     }
+
+    // At this point, prevY should be the last point drawn
+    // This will display what y value the last point was at
+    strokeWeight(1);
+    text(prevY.toFixed(3), x + 20,  (y + h) - prevY * yScale)
 }
