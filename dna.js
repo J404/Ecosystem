@@ -34,9 +34,20 @@ class Dna {
       }
     }
 
-    console.log(offspringGenes);
-    
     return offspringGenes;
+  }
+
+  // Accepts a set of genes and an amount to modify them by, then returns a set of genes
+  // that are modified by the amount
+  // Genes can be modified by a amount +/- the range
+  static modifyAll(genes, amount, range) {
+    const newGenes = {};
+
+    for (let gene in genes) {
+      newGenes[gene] = genes[gene] * random(amount - range, amount + range);
+    }
+
+    return newGenes;
   }
   
   // method for directly mutating genes

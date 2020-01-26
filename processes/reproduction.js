@@ -12,11 +12,30 @@ const reproduce = (father, mother) => {
     // Number of  offspring per birth is determined by genes
     for (let i = 0; i < mother.dna.genes.numOffspring; i++) {
         // Offspring's genes are determined by mother and father's
-        const offspringGenes = Dna.crossover(father, mother, 0.15);
+        const offspringGenes = Dna.crossover(father, mother, 0.1);
 
         // Create a new creature and set it's genes equal to those inherited above
         const offspring = new Creature(mother.pos.x, mother.pos.y);
         offspring.dna.genes = offspringGenes;
+
+        // To punish the creatures for having offspring too quickly, we will
+        // simulate 'underbred' creatures by lessening each trait
+        let degreeDeveloped = Math.log(mother.dna.genes.gestationPeriod / 60);
+
+        // The log function has a nice curve that makes it harshly affect very small things and not harshly
+        // affect larger values
+        // We use 1/60 because 600 (the default) / 60 = 10 and log(10) = 1
+
+        if (degreeDeveloped > 1.05)
+            degreeDeveloped = 1.05; // The genes shouldn't ever increase by more than this so we don't get super creatures
+        else if (degreeDeveloped < 0.8)
+            degreeDeveloped = 0.8; // The genes shouldn't ever decrease by more than this
+
+        // Modify all will change each value in a range around our modifier
+        offspring.dna.genes = Dna.modifyAll(offspring.dna.genes, degreeDeveloped, 0.05);
+
+        // Makes sure offspring don't instantly mate with each other
+        offspring.reproductionCooldown = 150;
     
         // Add it to our creatures array
         creatures.push(offspring);
