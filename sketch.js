@@ -2,24 +2,33 @@ let food = [];
 let foodTick = 0;
 
 let creatures = [];
+const startingNumCreatures = 10;
 let creatureStats;
 let creatureHistory = [];
 let infoTick = 0;
 
 let debug = true;
 
+const environmentWidth = 1500;
+const environmentHeight = 1500;
+
 function setup() {
-  createCanvas(1000, 1000);
+  createCanvas(2000, 1500);
+
+  initGraph();
   
   for (let i = 0; i < 10; i++) {
-    food[i] = new Food(random(width), random(height));
+    food[i] = new Food(random(environmentWidth), random(environmentHeight));
   }
   
-  //for (let i = 0; i < 15; i++) {
-    creatures[0] = new Creature(random(width), random(height));
-    creatures[1] = new Creature(random(width), random(height));
-    creatures[1].dna.genes.speed = 5;
-  //}
+  for (let i = 0; i < startingNumCreatures; i++) {
+    creatures[i] = new Creature(random(environmentWidth), random(environmentHeight));
+    if (i % 2 == 0) {
+      creatures[i].sex = "female";
+    } else {
+      creatures[i].sex = "male";
+    }
+  }
   
   creatureStats = {
     num: 0,
@@ -32,9 +41,17 @@ function setup() {
 
 function draw() {
   background(0, 125, 0);
+
+  drawGraph("num", environmentWidth, 0, 500, 200);
+  drawGraph("speed", environmentWidth, 220, 500, 200);
+  drawGraph("mass", environmentWidth, 440, 500, 200);
+  drawGraph("range", environmentWidth, 660, 500, 200);
+  drawGraph("gestationPeriod", environmentWidth, 880, 500, 200);
+  drawGraph("reproductiveUrge", environmentWidth, 1100, 500, 200);
+  drawGraph("numOffspring", environmentWidth, 1320, 500, 200);
   
   foodTick++;
-  if (foodTick >= 50) {
+  if (foodTick >= 10) {
     foodTick = 0;
     newFood();
   }
@@ -43,22 +60,9 @@ function draw() {
     f.show();
   }
   
-  creatureStats.num = creatures.length;
-  creatureStats.speed = [];
-  creatureStats.mass = [];
-  creatureStats.range = [];
-  let totalSpeed = 0, totalMass = 0, totalRange = 0;
-  
   for (let c of creatures) {
     c.move();
     c.show();
-    
-    creatureStats.speed[creatureStats.speed.length] = c.speedLimit;
-    creatureStats.mass[creatureStats.mass.length] = c.mass;
-    creatureStats.range[creatureStats.range.length] = c.range;
-    totalSpeed += c.speedLimit;
-    totalMass += c.mass;
-    totalRange += c.range;
   }
   
   infoTick++;
@@ -67,16 +71,27 @@ function draw() {
   }
   if (infoTick > 500 && debug) {
     infoTick = 0;
-    console.log(creatureStats);
-    console.log("Number of creatures: " + creatureStats.num);
-    console.log("Average speed: " + totalSpeed / creatureStats.num);
-    console.log("Average mass: " + totalMass / creatureStats.num);
-    console.log("Average range: " + totalRange / creatureStats.num);
+
+    const creatureStats = {};
+
+    for (let gene in creatures[0].dna.genes) {
+      let geneVals = [];
+
+      for (let c of creatures) {
+        geneVals.push(c.dna.genes[gene]);
+      }
+
+      const avgVal = average(geneVals);
+      creatureStats[gene] = avgVal;
+    }
+
+    creatureStats.num = creatures.length;
+    addData(creatureStats);
   }
 }
 
 function newFood() {
-  food[food.length] = new Food(random(0, width), random(0, height));
+  food[food.length] = new Food(random(0, environmentWidth), random(0, environmentHeight));
 }
 
 function keyPressed() {
