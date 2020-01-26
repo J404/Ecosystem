@@ -1,5 +1,9 @@
 class Creature {
   constructor(x, y) {
+
+    // for lifespan & mating
+    this.lifespan = 0;
+
     // position values
     this.pos = createVector(x, y);
     this.vel = createVector(0, 0);
@@ -22,7 +26,7 @@ class Creature {
     this.gestating = false;
     this.gestatingPeriod = this.dna.genes.gestationPeriod;
     this.partner;
-    this.birthCooldown = 0;
+    this.reproductionCooldown = 0;
 
     // Object containing the 'urges' that influence the creature's behavior
     this.motivation = {
@@ -39,7 +43,7 @@ class Creature {
 
     // If the hunger is greater than the urge to reproduce, the creature will try to find food
     // If the creature is gestating, it will default to search for food
-    if ((this.motivation.hunger > this.motivation.reproductiveUrge) || this.gestating || this.birthCooldown > 0) {
+    if ((this.motivation.hunger > this.motivation.reproductiveUrge) || this.gestating || this.reproductionCooldown > 0) {
 
       // findFood method will search within creature's range and return closest food
       this.targetFood = findFood(this.pos, this.range);
@@ -93,6 +97,7 @@ class Creature {
 
           if (inRange) {
             mate(this, this.targetMate);
+            this.reproductionCooldown = 500;
 
             return 0;
           } else {
@@ -111,10 +116,13 @@ class Creature {
     this.mass = this.dna.genes.mass;
     this.range = this.dna.genes.range;
 
+    // Each tick the creature ages
+    this.lifespan++;
+
     // Exponential function to determine how much hunger is generated per step
     // more speed results in greater hunger loss
     this.motivation.hunger += 0.05 + .005 * this.speedLimit;
-    this.motivation.hunger += 0.005 * this.mass;
+    this.motivation.hunger += 0.001 * this.mass;
 
     // If our hunger is greater than 100, the creature is dead
     if (this.motivation.hunger > 100) {
@@ -131,13 +139,16 @@ class Creature {
           this.gestating = false;
 
           this.gestatingPeriod = this.dna.genes.gestationPeriod;
-          this.birthCooldown = 1500;
+          this.reproductionCooldown = 1500;
 
           reproduce(this.partner, this);
         }
-    } else if (this.birthCooldown > 0)
-      this.birthCooldown--;
+      }
     }
+
+    // Lower the cooldown each tick (if it's not at 0)
+    if (this.reproductionCooldown > 0)
+      this.reproductionCooldown--;
 
     // Get a goal direction from decide goal, then use that to control velocity/position
     const acc = this.decideGoal();
